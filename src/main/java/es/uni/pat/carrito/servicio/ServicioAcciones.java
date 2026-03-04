@@ -86,6 +86,18 @@ public class ServicioAcciones {
         return repoArticulo.save(articulo);
     }
 
+    @Transactional
+    public void borrarLinea(Long idArticulo) {
+
+        logger.info("Borrando articulo con id: " + idArticulo);
+
+        Articulo articulo = repoArticulo.findById(idArticulo)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Articulo no encontrado"));
+
+        repoArticulo.delete(articulo);
+    }
+
     //el programa te permite crear un carrito sin articulos
     public double calcularTotal(Long idCarrito) {
 

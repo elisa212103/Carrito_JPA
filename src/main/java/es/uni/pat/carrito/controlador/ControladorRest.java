@@ -45,6 +45,12 @@ public class ControladorRest {
         }
     }
 
+    @DeleteMapping("/articulos/{idArticulo}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void borrarLinea(@PathVariable Long idArticulo) {
+        servicioAcciones.borrarLinea(idArticulo);
+    }
+
     // Añadir artículo al carrito
     @PostMapping("/{id}/articulos")
     @ResponseStatus(HttpStatus.CREATED)
