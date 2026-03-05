@@ -1,6 +1,7 @@
 package es.uni.pat.carrito.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ public class Carrito {
     private Long idCarrito;
 
     @Column(nullable = false)
+    @Positive
     private Long idUsuario;
 
     @Column(nullable = false)
@@ -23,6 +25,12 @@ public class Carrito {
     private List<Articulo> articulos = new ArrayList<>();
 
     public Carrito() {}
+
+    // Constructor completo (para tests)
+    public Carrito(Long idUsuario, String correoUsuario) {
+        this.idUsuario = idUsuario;
+        this.correoUsuario = correoUsuario;
+    }
 
     public Long getIdCarrito() { return idCarrito; }
     public void setIdCarrito(Long idCarrito) { this.idCarrito = idCarrito; }
@@ -44,13 +52,4 @@ public class Carrito {
     }
 }
 
-//    public List<Articulo> getArticulos() {
-//        return articulos;
-//    }
-
-//    public double getPrecioFinal() {
-//        return articulos.stream()
-//                .mapToDouble(Articulo::getPrecioTotal)
-//                .sum();
-//    }
 

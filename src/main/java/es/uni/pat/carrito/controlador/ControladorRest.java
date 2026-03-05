@@ -3,8 +3,10 @@ package es.uni.pat.carrito.controlador;
 import es.uni.pat.carrito.entity.Articulo;
 import es.uni.pat.carrito.entity.Carrito;
 import es.uni.pat.carrito.servicio.ServicioAcciones;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +19,8 @@ public class ControladorRest {
     // CREATE carrito
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Carrito crea(@RequestBody Carrito nuevo) {
+    public Carrito crea(@RequestBody @Valid Carrito nuevo) {
+
         return servicioAcciones.crearCarrito(nuevo);
     }
 
@@ -55,7 +58,7 @@ public class ControladorRest {
     @PostMapping("/{id}/articulos")
     @ResponseStatus(HttpStatus.CREATED)
     public Articulo añadir(@PathVariable Long id,
-                                   @RequestBody Articulo articulo) {
+                                   @Valid @RequestBody Articulo articulo) {
         return servicioAcciones.añadirLinea(id, articulo);
     }
 
