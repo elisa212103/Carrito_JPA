@@ -68,3 +68,14 @@ public class ControladorRest {
         return servicioAcciones.calcularTotal(id);
     }
 }
+
+//ejemplo de PATCH (modificar solo una parte del objeto)
+//@PatchMapping("/carritos/{id}")
+//public Carrito actualizarCorreo(@PathVariable Long id,
+//                                @RequestBody String nuevoCorreo) {
+//
+//    Carrito carrito = carritoRepository.findById(id).orElseThrow();
+//    carrito.setCorreoUsuario(nuevoCorreo);
+//
+//    return carritoRepository.save(carrito);
+//}
