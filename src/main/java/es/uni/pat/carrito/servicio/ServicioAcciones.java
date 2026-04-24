@@ -2,8 +2,10 @@ package es.uni.pat.carrito.servicio;
 
 import es.uni.pat.carrito.entity.Articulo;
 import es.uni.pat.carrito.entity.Carrito;
-import es.uni.pat.carrito.repositorio.RepoArticulo;
+import es.uni.pat.carrito.entity.Linea;
 import es.uni.pat.carrito.repositorio.RepoCarrito;
+import es.uni.pat.carrito.repositorio.RepoArticulo;
+import es.uni.pat.carrito.repositorio.RepoLinea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class ServicioAcciones {
 
     @Autowired
     private RepoArticulo repoArticulo;
+
+    @Autowired
+    private RepoLinea repoLinea;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -74,47 +79,96 @@ public class ServicioAcciones {
 
 
     @Transactional
-    public Articulo añadirLinea(Long idCarrito, Articulo articulo) {
+    public Linea addLinea(Long idCarrito, Long idArticulo, int unidades) {
+        logger.info("Añadiendo artículo {} al carrito {}", idArticulo, idCarrito);
 
-        logger.info("Añadiendo articulo al carrito: " + idCarrito);
+        if (unidades < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las unidades deben ser al menos 1");
+        }
+
         Carrito carrito = repoCarrito.findById(idCarrito)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrito no encontrado"));
 
-        articulo.setCarrito(carrito);
-
-        return repoArticulo.save(articulo);
-    }
-
-    @Transactional
-    public void borrarLinea(Long idArticulo) {
-
-        logger.info("Borrando articulo con id: " + idArticulo);
-
         Articulo articulo = repoArticulo.findById(idArticulo)
                 .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Articulo no encontrado"));
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado"));
 
-        repoArticulo.delete(articulo);
+        Linea lineaExistente = repoLinea
+                .findByCarritoIdCarritoAndArticuloIdArticulo(idCarrito, idArticulo)
+                .orElse(null);
+
+        if (lineaExistente != null) {
+            lineaExistente.setUnidades(lineaExistente.getUnidades() + unidades);
+            return repoLinea.save(lineaExistente);
+        } else {
+            Linea nuevaLinea = new Linea();
+            nuevaLinea.setCarrito(carrito);
+            nuevaLinea.setArticulo(articulo);
+            nuevaLinea.setUnidades(unidades);
+            return repoLinea.save(nuevaLinea);
+        }
     }
 
-    //el programa te permite crear un carrito sin articulos
-    public double calcularTotal(Long idCarrito) {
 
-        logger.info("Calculando total del carrito: " + idCarrito);
+    @Transactional
+    public void borrarLinea(Long idCarrito, Long idLinea) {
+        logger.info("Borrando línea {} del carrito {}", idLinea, idCarrito);
+
+        Linea lineaExistente = repoLinea.findByIdLineaAndCarritoIdCarrito(idLinea, idCarrito)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Línea no encontrada en el carrito"));
+
+        repoLinea.delete(lineaExistente);
+    }
+
+
+    @Transactional
+    public Linea actualizarUnidades(Long idCarrito, Long idLinea, int nuevasUnidades) {
+        logger.info("Actualizando unidades de la línea {} del carrito {}", idLinea, idCarrito);
+
+        Linea linea = repoLinea.findByIdLineaAndCarritoIdCarrito(idLinea, idCarrito)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Línea no encontrada en el carrito"));
+
+        if (nuevasUnidades < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las unidades no pueden ser negativas");
+        }
+
+        if (nuevasUnidades == 0) {
+            repoLinea.delete(linea);
+            return linea;
+        }
+
+        linea.setUnidades(nuevasUnidades);
+        return repoLinea.save(linea);
+    }
+
+    public double calcularTotal(Long idCarrito) {
+        logger.info("Calculando total del carrito {}", idCarrito);
 
         if (!repoCarrito.existsById(idCarrito)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Carrito no encontrado");
         }
 
-        List<Articulo> articulos = repoArticulo.findByCarritoIdCarrito(idCarrito);
+        List<Linea> lineas = repoLinea.findByCarritoIdCarrito(idCarrito);
 
         double total = 0.0;
-
-        for (Articulo a : articulos) {
-            total += a.getPrecioTotal();
+        for (Linea l : lineas) {
+            total += l.getPrecioTotal();
         }
 
         return total;
     }
 }
+
+//ejemplo para hacerlo con bindingResults
+//@Transactional
+//public Carrito crearCarrito(Carrito nuevo, BindingResult bindingResult) {
+//
+//    if (bindingResult.hasErrors()) {
+//        throw new ExcepcionCarritoIncorrecto(bindingResult);
+//    }
+//
+//    return repoCarrito.save(nuevo);
+//}

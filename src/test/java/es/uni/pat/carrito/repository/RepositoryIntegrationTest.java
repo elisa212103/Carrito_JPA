@@ -2,8 +2,10 @@ package es.uni.pat.carrito.repository;
 
 import es.uni.pat.carrito.entity.Articulo;
 import es.uni.pat.carrito.entity.Carrito;
+import es.uni.pat.carrito.entity.Linea;
 import es.uni.pat.carrito.repositorio.RepoArticulo;
 import es.uni.pat.carrito.repositorio.RepoCarrito;
+import es.uni.pat.carrito.repositorio.RepoLinea;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,9 @@ public class RepositoryIntegrationTest {
     @Autowired
     RepoCarrito repoCarrito;
 
+    @Autowired
+    RepoLinea repoLinea;
+
     @Test
     void guardarCarritoTest() {
         //Dado
@@ -39,22 +44,46 @@ public class RepositoryIntegrationTest {
     void guardarArticuloTest() {
 
         // Given
-        Carrito carrito = new Carrito(3L, "elisa.lapastora@gmail");
-        carrito = repoCarrito.save(carrito);
 
         Articulo articulo = new Articulo();
         articulo.setDescripcion("Libro Java");
-        articulo.setUnidades(2);
         articulo.setPrecioUnitario(10.0);
-        articulo.setCarrito(carrito);
 
         // When
         articulo = repoArticulo.save(articulo);
 
         // Then
         assertNotNull(articulo.getIdArticulo());
-        assertEquals(carrito.getIdCarrito(), articulo.getCarrito().getIdCarrito());
+    }
+
+    @Test
+    void guardarLineaTest() {
+
+        // Given
+        Carrito carrito = new Carrito(3L, "elisa.lapastora@gmail.com");
+        carrito = repoCarrito.save(carrito);
+
+        Articulo articulo = new Articulo();
+        articulo.setDescripcion("Libro Java");
+        articulo.setPrecioUnitario(10.0);
+        articulo = repoArticulo.save(articulo);
+
+        Linea linea = new Linea();
+        linea.setCarrito(carrito);
+        linea.setArticulo(articulo);
+        linea.setUnidades(3);
+
+        // When
+        linea = repoLinea.save(linea);
+
+        // Then
+        assertNotNull(linea.getIdLinea());
+        assertEquals(carrito.getIdCarrito(), linea.getCarrito().getIdCarrito());
+        assertEquals(articulo.getIdArticulo(), linea.getArticulo().getIdArticulo());
+        assertEquals(3, linea.getUnidades());
+        assertEquals(30.0, linea.getPrecioTotal());
     }
 
 }
+
 

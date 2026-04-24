@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 @Profile("!test") //los tests no fallaran por configuracion seguridad
 public class ConfiguracionSeguridad {
-
+/*
     @Bean
     public SecurityFilterChain configuracion(HttpSecurity http) throws Exception {
 
@@ -46,6 +46,23 @@ public class ConfiguracionSeguridad {
 
         return http.build();
     }
+
+ */
+
+    @Bean
+    public SecurityFilterChain configuracion(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().permitAll()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable())
+                );
+
+        return http.build();
+    }
+
 
 
     @Bean

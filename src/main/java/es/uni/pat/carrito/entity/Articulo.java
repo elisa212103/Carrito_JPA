@@ -1,46 +1,30 @@
 package es.uni.pat.carrito.entity;
 
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
 @Entity
 public class Articulo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idArticulo;
 
-    @ManyToOne
-    @JoinColumn(name = "carrito_id", referencedColumnName = "idCarrito", nullable = false)
-    private Carrito carrito;
-
     @Column(nullable = false)
+    @NotBlank
     private String descripcion;
 
     @Column(nullable = false)
-    @Min(1)
-    private int unidades;
-
-    @Column
-    @NotNull
     @Positive
     private double precioUnitario;
 
-    @Transient
-    public double getPrecioTotal() {
-        return unidades * precioUnitario;
-    }
-
-    //constructor vacio para JPA
+    // constructor vacío para JPA
     public Articulo() {}
 
-    public Articulo(String descripcion, int unidades, double precioUnitario, Carrito carrito) {
+    public Articulo(Long idArticulo, String descripcion, double precioUnitario) {
         this.descripcion = descripcion;
-        this.unidades = unidades;
         this.precioUnitario = precioUnitario;
-        this.carrito = carrito;
+        this.idArticulo = idArticulo;
     }
 
     public Long getIdArticulo() {
@@ -59,14 +43,6 @@ public class Articulo {
         this.descripcion = descripcion;
     }
 
-    public int getUnidades() {
-        return unidades;
-    }
-
-    public void setUnidades(int unidades) {
-        this.unidades = unidades;
-    }
-
     public double getPrecioUnitario() {
         return precioUnitario;
     }
@@ -74,20 +50,4 @@ public class Articulo {
     public void setPrecioUnitario(double precioUnitario) {
         this.precioUnitario = precioUnitario;
     }
-
-    public void setCarrito(Carrito carrito){
-        this.carrito = carrito;
-    }
-
-    public Carrito getCarrito(){
-        return carrito;
-    }
-
-
 }
-
-//    mas validaciones:
-//   - si quiero que sea o una u otra:
-//     @Pattern(regexp = "^(compra|venta)$", message = "El valor debe ser 'compra' o 'venta'")
-//   - comprobar que es email (@)
-//     @Email

@@ -1,6 +1,8 @@
 package es.uni.pat.carrito.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
 import java.util.ArrayList;
@@ -18,11 +20,16 @@ public class Carrito {
     private Long idUsuario;
 
     @Column(nullable = false)
+    @Email
+    @NotBlank
     private String correoUsuario;
 
     //mapeo bidireccional para los onetomany
-    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL)
-    private List<Articulo> articulos = new ArrayList<>();
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Linea> lineas = new ArrayList<>();
+
+    //DIFERENCIA -> CascadeType, si se borra carrito se borran sus lineas (padre-hijo)
+    //           -> OrphanRemoval, si se borra una linea de carrito se borra de BD lineas
 
     public Carrito() {}
 
@@ -41,12 +48,18 @@ public class Carrito {
     public String getCorreoUsuario() { return correoUsuario; }
     public void setCorreoUsuario(String correoUsuario) { this.correoUsuario = correoUsuario; }
 
-    public List<Articulo> getArticulos() { return articulos; }
 
+    public void setLineas(List<Linea> lineas) {
+        this.lineas = lineas;
+    }
+    public List<Linea> getLineas() { return lineas; }
+
+    //para los datos calculados, que no queremos almacenar
+    @Transient
     public double getPrecioFinal() {
         double total = 0.0;
-        for (Articulo a : articulos) {
-            total += a.getPrecioTotal();
+        for (Linea l : lineas) {
+            total += l.getPrecioTotal();
         }
         return total;
     }

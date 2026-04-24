@@ -1,15 +1,17 @@
-INSERT INTO carrito (id_usuario, correo_usuario)
+INSERT INTO Carrito (id_usuario, correo_usuario)
 VALUES (1, 'elisa.lapastora@gmail.com');
 
-INSERT INTO carrito (id_usuario, correo_usuario)
-VALUES (2, 'pepe@gmail.com');
-
 -- carrito_id debe de existir dentro de bd carrito
-INSERT INTO articulo (descripcion, unidades, precio_unitario, carrito_id)
-VALUES ('Libro Java', 2, 15.5, 1);
+--los nombres en datasql se traducen de camelCase a snake_case
 
-INSERT INTO articulo (descripcion, unidades, precio_unitario, carrito_id)
-VALUES ('Teclado', 1, 45.0, 1);
+INSERT INTO Articulo (id_articulo, descripcion, precio_unitario)
+VALUES (1, 'Ramo de gardenias lila', 29.99);
 
-INSERT INTO articulo (descripcion, unidades, precio_unitario, carrito_id)
-VALUES ('Ratón', 3, 12.0, 2);
+INSERT INTO Articulo (id_articulo, descripcion, precio_unitario)
+VALUES (2,'Ramo de tulipanes selectos', 39.99);
+
+INSERT INTO Articulo (id_articulo, descripcion, precio_unitario)
+VALUES (3, 'Ramo de girasoles', 39.99);
+
+INSERT INTO Articulo (id_articulo, descripcion, precio_unitario)
+VALUES (4, 'Ramo de rosas color coral', 49.99);
